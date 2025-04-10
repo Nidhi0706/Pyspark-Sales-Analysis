@@ -4,7 +4,7 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,Sales Dataframe
+# Sales Dataframe
 from pyspark.sql.types import StructType,StructField,IntegerType,StringType,DateType
 
 schema=StructType([
@@ -20,7 +20,7 @@ display(sales_df)
 
 # COMMAND ----------
 
-# DBTITLE 1,Year, Month and Quarter
+# Year, Month and Quarter
 from pyspark.sql.functions import month,year,quarter
 
 sales_df = sales_df.withColumn("order_year",year(sales_df.order_date))
@@ -30,7 +30,7 @@ display(sales_df)
 
 # COMMAND ----------
 
-# DBTITLE 1,Menu_df
+# Menu_df
 schema1 = StructType([
     StructField("product_id",IntegerType(),True),
     StructField("product_name",StringType(),True),
@@ -42,19 +42,19 @@ display(menu_df)
 
 # COMMAND ----------
 
-# DBTITLE 1,Total amount spent by each customer
+# Total amount spent by each customer
 total_amt_spent = (sales_df.join(menu_df,'product_id').groupBy('customer_id').agg({'price':'sum'}).orderBy('customer_id'))
 display(total_amt_spent)
 
 # COMMAND ----------
 
-# DBTITLE 1,Total amount spent by each food category
+# Total amount spent by each food category
 total_amt_spent = (sales_df.join(menu_df,'product_id').groupBy('product_name').agg({'price':'sum'}).orderBy('product_name'))
 display(total_amt_spent)
 
 # COMMAND ----------
 
-# DBTITLE 1,Total amount of sales in each month
+# Total amount of sales in each month
 df1 = (sales_df.join(menu_df,'product_id').groupBy('order_month').agg({'price':'sum'}).orderBy('order_month'))
 display(df1)
 
@@ -65,13 +65,13 @@ display(df2)
 
 # COMMAND ----------
 
-# DBTITLE 1,Quarterly sales
+# Quarterly sales
 df3 = (sales_df.join(menu_df,'product_id').groupBy('order_quarter').agg({'price':'sum'}).orderBy('order_quarter'))
 display(df3)
 
 # COMMAND ----------
 
-# DBTITLE 1,How many times each product purchased
+# How many times each product purchased
 from pyspark.sql.functions import count
 
 most_purchased = (sales_df.join(menu_df,'product_id').groupBy('product_id','product_name')
@@ -84,7 +84,7 @@ display(most_purchased)
 
 # COMMAND ----------
 
-# DBTITLE 1,Top 5 ordered items
+# Top 5 ordered items
 top5_purchased = (sales_df.join(menu_df,'product_id').groupBy('product_id','product_name')
                   .agg(count('product_id').alias('product_count'))
                   .orderBy('product_count',ascending = 0)
@@ -95,7 +95,7 @@ display(top5_purchased)
 
 # COMMAND ----------
 
-# DBTITLE 1,Top ordered item
+# Top ordered item
 top_ordered = (sales_df.join(menu_df,'product_id').groupBy('product_id','product_name')
                   .agg(count('product_id').alias('product_count'))
                   .orderBy('product_count',ascending = 0)
@@ -106,7 +106,7 @@ display(top_ordered)
 
 # COMMAND ----------
 
-# DBTITLE 1,Frequency of customer visited to Restaurant
+# Frequency of customer visited to Restaurant
 from pyspark.sql.functions import countDistinct
 
 df = (sales_df.filter(sales_df.source_order == 'Restaurant').groupBy('customer_id').agg(countDistinct('order_date')))
@@ -114,13 +114,13 @@ display(df)
 
 # COMMAND ----------
 
-# DBTITLE 1,Total sales by each country
+# Total sales by each country
 total_sales = (sales_df.join(menu_df,'product_id').groupBy('location').agg({'price':'sum'}))
 display(total_sales)
 
 # COMMAND ----------
 
-# DBTITLE 1,total sales by order_source
+# Total sales by order_source
 total_sales = (sales_df.join(menu_df,'product_id').groupBy('source_order').agg({'price':'sum'}))
 display(total_sales)
 
